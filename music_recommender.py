@@ -1,11 +1,16 @@
+import streamlit as st
 import pandas as pd
 import re
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Load dataset
-df = pd.read_csv("tcc_ceds_music.csv")
+@st.cache_data
+def load_data():
+    return pd.read_csv("tcc_ceds_music.csv")
+
+df = load_data()
+
 MOOD_GENRE_MAP = {
     "Romantic": ["jazz", "pop"],
     "Chill": ["jazz", "blues"],
@@ -13,7 +18,6 @@ MOOD_GENRE_MAP = {
     "Happy": ["pop"],
     "Sad": ["country", "blues"]
 }
-
 def clean_text(text):
     text = text.lower()
     text = re.sub(r'[^a-zA-Z0-9 ]', '', text)
