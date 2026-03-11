@@ -1,115 +1,186 @@
-🎵 Music Recommendation System
+\# 🎵 Music Recommendation System
 
-📌 Project Overview
 
 
+\## 📌 Project Overview
 
-This project is a content-based music recommendation system that suggests similar songs based on textual metadata such as track name, artist name, and genre.
 
 
+This project is a \*\*Content-Based Music Recommendation System\*\* that suggests songs similar to a selected track based on textual metadata such as \*\*track name, artist name, and genre\*\*.
 
-The system uses Natural Language Processing (NLP) techniques along with TF-IDF vectorization and Cosine Similarity to generate relevant music recommendations.
 
 
+The system applies \*\*Natural Language Processing (NLP)\*\* techniques using \*\*TF-IDF Vectorization\*\* and \*\*Cosine Similarity\*\* to compute song similarity and generate recommendations.
 
-📅 Day-Wise Project Progress
 
-✅ Day 1 – Problem Understanding \& Dataset Exploration
 
+An interactive web interface is built using \*\*Streamlit\*\*, allowing users to search for a song and receive similar music recommendations instantly.
 
 
-* Understood the concept of content-based recommendation systems
-* Explored the music dataset and identified relevant features
-* Analyzed columns such as track name, artist name, and genre
 
+\---
 
 
-✅ Day 2 – Data Cleaning \& Preprocessing
 
+\## 🚀 Live Demo
 
 
-Handled missing values
 
+Deployed using Streamlit Cloud.
 
 
-Normalized text (lowercasing, removing special characters)
 
+Live App:
 
+https://music-recommendation-system1902.streamlit.app
 
-Prepared clean textual data for feature engineering
 
 
+\---
 
-✅ Day 3 – Feature Engineering
 
 
+\## 🛠️ Tech Stack
 
-Combined multiple textual features into a single column
 
 
+\* Python
 
-Applied feature weighting by repeating important attributes
+\* Pandas
 
+\* NumPy
 
+\* Scikit-learn
 
-Improved feature importance for better similarity results
+\* Streamlit
 
+\* Natural Language Processing (NLP)
 
 
-✅ Day 4 – TF-IDF Vectorization
 
+\---
 
 
-Applied TF-IDF to convert text into numerical vectors
 
+\## ⚙️ How It Works
 
 
-Used unigrams and bigrams for richer text representation
 
+1\. The dataset containing music metadata is loaded.
 
+2\. Important textual features such as \*\*track name, artist name, and genre\*\* are combined.
 
-Removed stopwords to reduce noise
+3\. Text data is converted into numerical vectors using \*\*TF-IDF Vectorization\*\*.
 
+4\. \*\*Cosine Similarity\*\* is calculated between songs.
 
+5\. When a user selects a song, the system returns \*\*Top-N most similar songs\*\*.
 
-✅ Day 5 – Similarity Computation
 
 
+\---
 
-Calculated cosine similarity between songs
 
 
+\## 📂 Project Structure
 
-Generated similarity matrix
 
 
+```
 
-Validated similarity scores for relevance
+music-recommendation-system
 
+│
 
+├── app.py
 
-✅ Day 6 – Recommendation Logic
+├── music\_recommender.py
 
+├── requirements.txt
 
+├── tcc\_ceds\_music.csv
 
-Built a recommendation function to return top-N similar songs
+├── background.jpg
 
+└── README.md
 
+```
 
-Handled invalid or unknown song inputs
 
 
+\---
 
-Ensured no duplicate recommendations
 
 
+\## ⚙️ Installation \& Running Locally
 
-🚧 Day 7 – Streamlit Integration (In Progress)
 
 
+Clone the repository:
 
-* Installed and configured Python, pip, and Streamlit
-* Restructured project from notebook to application format
-* Created backend module (music\_recommender.py)
-* Built initial Streamlit UI (app.py)
-* Resolved environment, path, and import issues
+
+
+```
+
+git clone https://github.com/yourusername/music-recommendation-system.git
+
+cd music-recommendation-system
+
+```
+
+
+
+Install dependencies:
+
+
+
+```
+
+pip install -r requirements.txt
+
+```
+
+
+
+Run the application:
+
+
+
+```
+
+streamlit run app.py
+
+```
+
+
+
+\---
+
+
+
+\## 🎯 Future Improvements
+
+
+
+\* Add album artwork and music posters
+
+\* Integrate Spotify API for real-time music data
+
+\* Improve UI/UX design
+
+\* Add collaborative filtering recommendations
+
+
+
+\---
+
+
+
+\## 👨‍💻 Author
+
+
+
+Sampath Sahu
+
+
+
