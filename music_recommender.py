@@ -38,7 +38,7 @@ df['combined_features'] = (
 
 df['combined_features'] = df['combined_features'].apply(clean_text)
 
-tfidf = TfidfVectorizer(stop_words='english', max_features=5000)
+tfidf = TfidfVectorizer(stop_words='english', max_features=3000)
 tfidf_matrix = tfidf.fit_transform(df['combined_features'])
 
 feature_names = tfidf.get_feature_names_out()
