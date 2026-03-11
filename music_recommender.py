@@ -5,16 +5,19 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv("tcc_ceds_music.csv", encoding="latin1")
-        return df
+        return pd.read_csv("tcc_ceds_music.csv", low_memory=False, encoding="latin1")
     except Exception as e:
         st.error(e)
-
+        return None
+    
 df = load_data()
+
+if df is None:
+    st.stop()
+
 MOOD_GENRE_MAP = {
     "Romantic": ["jazz", "pop"],
     "Chill": ["jazz", "blues"],
