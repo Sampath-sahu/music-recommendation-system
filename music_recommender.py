@@ -12,14 +12,15 @@ def load_data():
     except Exception as e:
         st.error(e)
         return None
-    
+
+# Limit dataset size for Streamlit Cloud memory
 df = load_data()
 
 if df is None:
     st.stop()
 
-# Limit dataset size for Streamlit Cloud memory
-df = df.groupby('genre').sample(n=500, replace=True, random_state=42)
+# Balance genres and reset index
+df = df.groupby('genre').sample(n=500, replace=True, random_state=42).reset_index(drop=True)
 
 MOOD_GENRE_MAP = {
     "Romantic": ["jazz", "pop"],
@@ -28,13 +29,8 @@ MOOD_GENRE_MAP = {
     "Happy": ["pop"],
     "Sad": ["country", "blues"]
 }
-genres = sorted(
-    set(
-        genre.strip()
-        for genres in df['genre'].dropna()
-        for genre in genres.split(',')
-    )
-)
+
+genres = sorted(df['genre'].dropna().unique())
 def clean_text(text):
     text = text.lower()
     text = re.sub(r'[^a-zA-Z0-9 ]', '', text)
