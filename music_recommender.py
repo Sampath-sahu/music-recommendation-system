@@ -139,6 +139,8 @@ def recommend_song(track_name, df, cosine_sim, indices, mood=None, top_n=5):
     }
 
 
+# -------- Streamlit UI -------- #
+
 song_input = st.text_input("Enter Song Name")
 
 mood = st.selectbox(
