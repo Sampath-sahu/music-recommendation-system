@@ -5,6 +5,8 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+st.title("🎵 Music Recommendation System")
+
 @st.cache_data
 def load_data():
     try:
@@ -13,7 +15,7 @@ def load_data():
         st.error(e)
         return None
 
-# Limit dataset size for Streamlit Cloud memory
+# Load dataset
 df = load_data()
 
 if df is None:
@@ -31,12 +33,12 @@ MOOD_GENRE_MAP = {
     "Sad": ["country", "blues"]
 }
 
-genres = sorted(df['genre'].dropna().unique())
 def clean_text(text):
-    text = text.lower()
+    text = str(text).lower()
     text = re.sub(r'[^a-zA-Z0-9 ]', '', text)
     return text
 
+# Combine features
 df['combined_features'] = (
     df['track_name'] + " " +
     df['artist_name'] + " " +
@@ -45,20 +47,20 @@ df['combined_features'] = (
 
 df['combined_features'] = df['combined_features'].apply(clean_text)
 
+# TF-IDF
 tfidf = TfidfVectorizer(stop_words='english', max_features=3000)
 tfidf_matrix = tfidf.fit_transform(df['combined_features'])
 
 feature_names = tfidf.get_feature_names_out()
+
+# Cosine similarity
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
+# Song index mapping
 df["song_clean"] = df["track_name"].str.lower().str.strip()
 indices = pd.Series(df.index, index=df["song_clean"]).drop_duplicates()
 
 def cold_start_recommend(df, top_n=5):
-    """
-    Fallback recommendation when input song is not found.
-    Currently returns top-N songs from dataset.
-    """
     return df[['track_name', 'artist_name', 'genre']].head(top_n)
 
 def get_top_keywords(song_index, tfidf_matrix, feature_names, top_n=3):
@@ -67,8 +69,8 @@ def get_top_keywords(song_index, tfidf_matrix, feature_names, top_n=3):
     return [feature_names[i] for i in top_indices if vector[i] > 0]
 
 def recommend_song(track_name, df, cosine_sim, indices, mood=None, top_n=5):
-    song_name = track_name.lower().strip()
 
+    song_name = track_name.lower().strip()
     top_n = min(top_n, len(df) - 1)
 
     if song_name in indices:
@@ -85,48 +87,76 @@ def recommend_song(track_name, df, cosine_sim, indices, mood=None, top_n=5):
 
     scores = list(enumerate(cosine_sim[idx].ravel()))
     scores = sorted(scores, key=lambda x: x[1], reverse=True)
-    scores = scores[1 : top_n + 1]
+    scores = scores[1: top_n + 1]
 
     if not scores:
         return {
             "type": "cold_start",
-            "message": "Not enough similar songs found. Showing popular recommendations.",
+            "message": "Not enough similar songs found.",
             "results": cold_start_recommend(df, top_n)
         }
 
     results = []
-seen_songs = set()
+    seen_songs = set()
 
-for i, score in scores:
+    for i, score in scores:
 
-    if i >= len(df):
-        continue
-
-    genre = str(df.iloc[i]["genre"]).lower()
-
-    if mood and mood in MOOD_GENRE_MAP:
-        allowed = MOOD_GENRE_MAP[mood]
-        if not any(g in genre for g in allowed):
+        if i >= len(df):
             continue
 
-    explanation = get_top_keywords(
-        i,
-        tfidf_matrix,
-        feature_names,
-        top_n=3
-    )
+        genre = str(df.iloc[i]["genre"]).lower()
 
-    song = df.iloc[i]["track_name"]
+        if mood and mood in MOOD_GENRE_MAP:
+            allowed = MOOD_GENRE_MAP[mood]
+            if not any(g in genre for g in allowed):
+                continue
 
-    if song in seen_songs:
-        continue
+        explanation = get_top_keywords(
+            i,
+            tfidf_matrix,
+            feature_names,
+            top_n=3
+        )
 
-    seen_songs.add(song)
+        song = df.iloc[i]["track_name"]
 
-    results.append({
-        "track_name": df.iloc[i]["track_name"],
-        "artist_name": df.iloc[i]["artist_name"],
-        "genre": df.iloc[i]["genre"],
-        "similarity (%)": round(score * 100, 2),
-        "why": explanation
-    })
+        if song in seen_songs:
+            continue
+
+        seen_songs.add(song)
+
+        results.append({
+            "track_name": df.iloc[i]["track_name"],
+            "artist_name": df.iloc[i]["artist_name"],
+            "genre": df.iloc[i]["genre"],
+            "similarity (%)": round(score * 100, 2),
+            "why": ", ".join(explanation)
+        })
+
+    return {
+        "type": "recommendation",
+        "results": pd.DataFrame(results)
+    }
+
+
+song_input = st.text_input("Enter Song Name")
+
+mood = st.selectbox(
+    "Select Mood (Optional)",
+    ["None", "Romantic", "Chill", "Energetic", "Happy", "Sad"]
+)
+
+top_n = st.slider("Number of Recommendations", 1, 10, 5)
+
+if st.button("Recommend Songs"):
+
+    mood_value = None if mood == "None" else mood
+
+    rec = recommend_song(song_input, df, cosine_sim, indices, mood_value, top_n)
+
+    if rec["type"] == "cold_start":
+        st.warning(rec["message"])
+        st.dataframe(rec["results"])
+    else:
+        st.success("Recommended Songs")
+        st.dataframe(rec["results"])
