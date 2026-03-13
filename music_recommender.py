@@ -20,7 +20,8 @@ if df is None:
     st.stop()
 
 # Balance genres and reset index
-df = df.groupby('genre').sample(n=500, replace=True, random_state=42).reset_index(drop=True)
+df = df.groupby('genre').sample(n=500, random_state=42)
+df = df.drop_duplicates(subset=['track_name', 'artist_name']).reset_index(drop=True)
 
 MOOD_GENRE_MAP = {
     "Romantic": ["jazz", "pop"],
@@ -94,44 +95,38 @@ def recommend_song(track_name, df, cosine_sim, indices, mood=None, top_n=5):
         }
 
     results = []
+seen_songs = set()
 
-    for i, score in scores:
+for i, score in scores:
 
-        if i >= len(df):
-         continue
+    if i >= len(df):
+        continue
 
-        genre = str(df.iloc[i]["genre"]).lower()
+    genre = str(df.iloc[i]["genre"]).lower()
 
-        # 🎭 Mood filter
-        if mood and mood in MOOD_GENRE_MAP:
-            allowed = MOOD_GENRE_MAP[mood]
-            if not any(g in genre for g in allowed):
-                continue
+    if mood and mood in MOOD_GENRE_MAP:
+        allowed = MOOD_GENRE_MAP[mood]
+        if not any(g in genre for g in allowed):
+            continue
 
-        explanation = get_top_keywords(
-            i,
-            tfidf_matrix,
-            feature_names,
-            top_n=3
-        )
+    explanation = get_top_keywords(
+        i,
+        tfidf_matrix,
+        feature_names,
+        top_n=3
+    )
 
-        results.append({
-            "track_name": df.iloc[i]["track_name"],
-            "artist_name": df.iloc[i]["artist_name"],
-            "genre": df.iloc[i]["genre"],
-            "similarity (%)": round(score * 100, 2),
-            "why": explanation
-        })
+    song = df.iloc[i]["track_name"]
 
-    if not results:
-        return {
-            "type": "cold_start",
-            "message": f"No {mood} songs found. Showing general recommendations.",
-            "results": cold_start_recommend(df, top_n)
-        }
+    if song in seen_songs:
+        continue
 
-    return {
-        "type": "normal",
-        "message": f"Similar {mood if mood else ''} songs found.",
-        "results": results[:top_n]
-    }
+    seen_songs.add(song)
+
+    results.append({
+        "track_name": df.iloc[i]["track_name"],
+        "artist_name": df.iloc[i]["artist_name"],
+        "genre": df.iloc[i]["genre"],
+        "similarity (%)": round(score * 100, 2),
+        "why": explanation
+    })
