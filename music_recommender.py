@@ -28,6 +28,13 @@ MOOD_GENRE_MAP = {
     "Happy": ["pop"],
     "Sad": ["country", "blues"]
 }
+genres = sorted(
+    set(
+        genre.strip()
+        for genres in df['genre'].dropna()
+        for genre in genres.split(',')
+    )
+)
 def clean_text(text):
     text = text.lower()
     text = re.sub(r'[^a-zA-Z0-9 ]', '', text)
