@@ -18,6 +18,9 @@ df = load_data()
 if df is None:
     st.stop()
 
+# Limit dataset size for Streamlit Cloud memory
+df = df.head(5000)
+
 MOOD_GENRE_MAP = {
     "Romantic": ["jazz", "pop"],
     "Chill": ["jazz", "blues"],
