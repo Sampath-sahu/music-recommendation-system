@@ -19,7 +19,7 @@ if df is None:
     st.stop()
 
 # Limit dataset size for Streamlit Cloud memory
-df = df.head(5000)
+df = df.groupby('genre').sample(n=500, replace=True, random_state=42)
 
 MOOD_GENRE_MAP = {
     "Romantic": ["jazz", "pop"],
