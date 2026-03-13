@@ -269,8 +269,14 @@ if st.button("🎵 Recommend"):
                 mood=selected_mood,
                 top_n=top_n
             )
+        if not isinstance(result, dict):
+            result = {
+            "type": "normal",
+            "message": "Recommendations generated.",
+            "results": result
+    }
 
-        st.info(result["message"])
+        st.info(result.get("message", "Recommendations generated."))
 
         st.subheader("🎶 Recommendations")
 
