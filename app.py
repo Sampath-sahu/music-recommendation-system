@@ -17,6 +17,22 @@ st.set_page_config(
     layout="wide"
 )
 
+# Hide default Streamlit header / toolbar to prevent duplicate title
+st.markdown("""
+<style>
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    #MainMenu {
+        visibility: hidden;
+    }
+    /* Remove top padding that the hidden header leaves */
+    .block-container {
+        padding-top: 1rem !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # ── Session State Defaults ──────────────────────────────────────────
 if "random_song" not in st.session_state:
     st.session_state.random_song = ""
