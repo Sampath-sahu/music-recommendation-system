@@ -14,13 +14,23 @@ from music_recommender import (
 st.set_page_config(
     page_title="Music Recommender",
     page_icon="🎵",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # Hide default Streamlit header / toolbar to prevent duplicate title
 st.markdown("""
 <style>
+    /* Hide the header's visibility to hide the duplicate app title */
     header[data-testid="stHeader"] {
+        background-color: transparent !important;
+        visibility: hidden !important;
+    }
+    /* But make sure buttons (like the sidebar toggle) remain visible! */
+    header[data-testid="stHeader"] button {
+        visibility: visible !important;
+    }
+    .stAppDeployButton {
         display: none !important;
     }
     #MainMenu {
